@@ -5,6 +5,7 @@ namespace Cloudbadak\PaymentHub\Contracts;
 use Cloudbadak\PaymentHub\Enums\BankCode;
 use Cloudbadak\PaymentHub\Enums\EWalletCode;
 use Cloudbadak\PaymentHub\Enums\OutletCode;
+use Cloudbadak\PaymentHub\Enums\QRPaymentCode;
 use Cloudbadak\PaymentHub\Exceptions\UnsupportedPaymentMethodException;
 
 /**
@@ -35,6 +36,13 @@ abstract class AbstractPaymentGateway implements PaymentInterface
      * @var array<string, string>
      */
     protected array $outletCodeMap = [];
+
+    /**
+    * Mapping dari QRPaymentCode kanonikal ke kode spesifik gateway ini.
+    *
+    * @var array<string, string>
+    */
+    protected array $qrPaymentCodeMap = [];
 
     /**
      * Terjemahkan BankCode kanonikal ke kode string yang dipakai gateway ini.
@@ -84,6 +92,24 @@ abstract class AbstractPaymentGateway implements PaymentInterface
         if ($code === null) {
             throw new UnsupportedPaymentMethodException(
                 "Outlet [{$outlet->value}] is not supported by " . static::class
+            );
+        }
+
+        return $code;
+    }
+
+    /**
+     * Terjemahkan QRPaymentCode kanonikal ke kode string yang dipakai gateway ini.
+     *
+     * @throws UnsupportedPaymentMethodException jika QR payment tidak didukung gateway ini
+     */
+    protected function resolveQRPaymentCode(QRPaymentCode $qrPayment): string
+    {
+        $code = $this->qrPaymentCodeMap[$qrPayment->value] ?? null;
+
+        if ($code === null) {
+            throw new UnsupportedPaymentMethodException(
+                "QR Payment [{$qrPayment->value}] is not supported by " . static::class
             );
         }
 
