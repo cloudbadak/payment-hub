@@ -1,0 +1,27 @@
+{
+    "name": "cloudbadak/payment-hub",
+    "type": "library",
+    "description": "Hubungkan ke payment gateway pilihan dengan berbagai kemudahan dalam instalasi dan switch ke payment gateway lain dikemudian hari",
+    "keywords": [
+        "payment hub",
+        "gateway",
+        "multi payment"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Trisnawan",
+            "email": "contact@trisnawan.com",
+            "homepage": "https://trisnawan.com",
+            "role": "Programmer"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cloudbadak\\PaymentHub\\": "src/"
+        }
+    }
+}
