@@ -19,7 +19,7 @@ composer require cloudbadak/payment-hub
 Install juga sub-library sesuai dengan payment gateway yang Anda gunakan (bisa salah satu atau beberapa atau semuanya sesuai kebutuhan)
 
 ```bash
-composer require cloudbadak/payment-midtrans
+composer require cloudbadak/payment-hub-midtrans
 ```
 
 ## Cek Saldo
