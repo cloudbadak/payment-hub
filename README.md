@@ -8,18 +8,12 @@ Saat ini pustaka hanya mendukung integrasi ke beberapa penyedia pembayaran. Jika
 
 Penyedia pembayaran yang didukung saat ini:
 
-- Midtrans (PaymentMidtrans)
+- Midtrans (MidtransPayment)
 
 ## Instalasi
 
 ```bash
 composer require cloudbadak/payment-hub
-```
-
-Install juga sub-library sesuai dengan payment gateway yang Anda gunakan (bisa salah satu atau beberapa atau semuanya sesuai kebutuhan)
-
-```bash
-composer require cloudbadak/payment-hub-midtrans
 ```
 
 ## Cek Saldo
@@ -28,75 +22,111 @@ Gunakan perintah ini untuk mengambil data saldo dari vendor yang dipilih (tidak 
 
 Berikut penyedia pembayaran yang mendukung cek saldo:
 
-- iPaymu (PaymentIpaymu)
-- Xendit (PaymentXendit)
+- iPaymu (IpaymuPayment)
+- Xendit (XenditPayment)
 
 ```php
 use Cloudbadak\PaymentHub\PaymentHub;
+use Cloudbadak\PaymentHub\Providers\IpaymuPayment; // gunakan sesuai payment provider yang dipakai
 
-$paymentHub = new PaymentHub(new PaymentMidtrans());
+$paymentHub = new PaymentHub(new IpaymuPayment());
 $balance = (string) $paymentHub->balance();
 ```
 
 ## Menerima Pembayaran
 
-Gunakan kelas penyedia pembayaran pada konstruktor `PaymentHub`, misalkan `PaymentMidtrans`. Semua metode pembayaran mengembalikan data objek `Cloudbadak\PaymentHub\Data\PaymentResponse`.
+Gunakan kelas penyedia pembayaran pada konstruktor `PaymentHub`, misalkan `MidtransPayment`. Semua metode pembayaran mengembalikan data objek `Cloudbadak\PaymentHub\Data\PaymentResponse`.
+
+1. Inisialisasi kelas yang dibutuhkan
 
 ```php
 use Cloudbadak\PaymentHub\PaymentHub;
 use Cloudbadak\PaymentHub\Data\PaymentRequest;
 use Cloudbadak\PaymentHub\Data\PaymentResponse;
 
-use Cloudbadak\PaymentHubMidtrans\PaymentMidtrans;
+// gunakan sesuai payment provider yang dipakai
+use Cloudbadak\PaymentHub\Providers\MidtransPayment;
 ```
 
+2. Membuat objek payment request
+
 ```php
-$amount = 100000;
 $orderId = "[unique_id]";
+$amount = 100000;
 
-// Contoh: va dengan midtrans
 $order = new PaymentRequest($orderId, $amount);
+```
+
+3. Memilih metode pembayaran
+
+```php
+use Cloudbadak\PaymentHub\Enums\BankCode;
+use Cloudbadak\PaymentHub\Enums\EWalletCode;
+use Cloudbadak\PaymentHub\Enums\OutletCode;
+use Cloudbadak\PaymentHub\Enums\QRPaymentCode;
+use Cloudbadak\PaymentHub\Enums\CardlessCreditCode;
+
+// jika pakai virtual_account
 $order->setBank(BankCode::MANDIRI);
 
-$paymentHub = new PaymentHub(new PaymentMidtrans());
-$response = $paymentHub->charge($order);
-```
+// jika pakai e-wallet
+$order->setWallet(EWalletCode::OVO);
 
-### Metode pembayaran yang didukung
-
-Transfer bank atau virtual account bank.
-Berisi enum dari `Cloudbadak\PaymentHub\Enums\BankCode` yang di dukung.
-
-```php
-$order->setBank(BankCode::MANDIRI);
-```
-
-E-wallet seperti (Gopay, Shopeepay, OVO, dan Dana).
-Berisi enum dari `Cloudbadak\PaymentHub\Enums\EWalletCode` yang di dukung.
-
-```php
-$order->setWallet(EWalletCode::GOPAY);
-```
-
-QRIS (QR Payment).
-Berisi enum dari `Cloudbadak\PaymentHub\Enums\QRPaymentCode` yang di dukung.
-
-```php
-$order->setQRPayment(QRPaymentCode::QRIS);
-```
-
-Retail Outlet (Indomaret, Alfamart).
-Berisi enum dari `Cloudbadak\PaymentHub\Enums\OutletCode` yang di dukung.
-
-```php
+// jika pakai outlet
 $order->setOutlet(OutletCode::ALFAMART);
+
+// jika pakai qris
+$order->setQRPayment(QRPaymentCode::QRIS);
+
+// jika pakai credit card
+$order->setCardTokenId("token_id");
+
+// jika pakai pay later
+$order->setCardlessCredit(CardlessCreditCode::AKULAKU);
 ```
 
-Card Payment (Visa, Mastercard).
-Berisi `token_id` dari proses inquiry menggunakan SDK frontend dari penyedia pembayaran yang dipilih.
+4. Menambahkan data customer (opsional)
 
 ```php
-$order->setCardTokenId("[token_id]");
+use Cloudbadak\PaymentHub\Data\Customer;
+
+$customer = new Customer(
+    "cust_id",
+    "Nama Depan"
+    "Nama Belakang",
+    "email@example.com",
+    "08xxx"
+);
+$order->setCustomer($customer);
+```
+
+5. Menambahkan data items (opsional)
+
+```php
+use Cloudbadak\PaymentHub\Data\Item;
+
+$items = [
+    new Item("id", "Nama Produk 1", "Deskripsi 1", 1, 100000),
+    new Item("id", "Nama Produk 2", "Deskripsi 2", 2, 50000),
+]
+$order->setItems($items);
+```
+
+6. Menambahkan data seller (opsional)
+
+```php
+use Cloudbadak\PaymentHub\Data\Seller;
+
+$seller = new Seller("id", "Nama Toko", "email@example.com", "08xxx");
+$order->setSeller($seller);
+```
+
+7. Melakukan request pembayaran
+
+```php
+$paymentHub = new PaymentHub(new MidtransPayment());
+$response = $paymentHub->charge($order);
+
 ```
 
 ## Cek Transaksi
@@ -104,7 +134,7 @@ $order->setCardTokenId("[token_id]");
 Gunakan ini untuk mengambil data transaksi. Semua metode pembayaran mengembalikan data objek `Cloudbadak\PaymentHub\Data\PaymentResponse`.
 
 ```php
-$paymentHub = new PaymentHub(new PaymentMidtrans());
+$paymentHub = new PaymentHub(new MidtransPayment());
 $response = $paymentHub->get('[order_id]');
 ```
 
@@ -113,6 +143,18 @@ $response = $paymentHub->get('[order_id]');
 Gunakan ini untuk memproses, validasi, dan mengambil data dari webhook. Semua metode pembayaran mengembalikan data objek `Cloudbadak\PaymentHub\Data\PaymentResponse`.
 
 ```php
-$paymentHub = new PaymentHub(new PaymentMidtrans());
+$paymentHub = new PaymentHub(new MidtransPayment());
 $response = $paymentHub->webhook();
+```
+
+## ENVIRONMENT (development dan production)
+
+ENVIRONMENT yang tersedia di pustaka ini hanya `development` dan `production`. Silakan atur pada konfigurasi `*_ENVIRONMENT`.
+
+1. Midtrans
+
+```bash
+MIDTRANS_ENVIRONMENT = development
+MIDTRANS_SERVER_KEY = server_key
+MIDTRANS_CLIENT_KEY = client_key
 ```

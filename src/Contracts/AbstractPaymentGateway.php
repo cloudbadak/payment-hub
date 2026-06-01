@@ -45,6 +45,13 @@ abstract class AbstractPaymentGateway implements PaymentInterface
     protected array $qrPaymentCodeMap = [];
 
     /**
+    * Mapping dari CardlessCreditCode kanonikal ke kode spesifik gateway ini.
+    *
+    * @var array<string, string>
+    */
+    protected array $cardlessCreditCodeMap = [];
+
+    /**
      * Terjemahkan BankCode kanonikal ke kode string yang dipakai gateway ini.
      *
      * @throws UnsupportedPaymentMethodException jika bank tidak didukung gateway ini
@@ -81,6 +88,24 @@ abstract class AbstractPaymentGateway implements PaymentInterface
     }
 
     /**
+     * Terjemahkan QRPaymentCode kanonikal ke kode string yang dipakai gateway ini.
+     *
+     * @throws UnsupportedPaymentMethodException jika QR payment tidak didukung gateway ini
+     */
+    protected function resolveQRPaymentCode(QRPaymentCode $qrPayment): string
+    {
+        $code = $this->qrPaymentCodeMap[$qrPayment->value] ?? null;
+
+        if ($code === null) {
+            throw new UnsupportedPaymentMethodException(
+                "QR Payment [{$qrPayment->value}] is not supported by " . static::class
+            );
+        }
+
+        return $code;
+    }
+
+    /**
      * Terjemahkan OutletCode kanonikal ke kode string yang dipakai gateway ini.
      *
      * @throws UnsupportedPaymentMethodException jika outlet tidak didukung gateway ini
@@ -99,17 +124,17 @@ abstract class AbstractPaymentGateway implements PaymentInterface
     }
 
     /**
-     * Terjemahkan QRPaymentCode kanonikal ke kode string yang dipakai gateway ini.
+     * Terjemahkan CardlessCreditCode kanonikal ke kode string yang dipakai gateway ini.
      *
-     * @throws UnsupportedPaymentMethodException jika QR payment tidak didukung gateway ini
+     * @throws UnsupportedPaymentMethodException jika cardless credit tidak didukung gateway ini
      */
-    protected function resolveQRPaymentCode(QRPaymentCode $qrPayment): string
+    protected function resolveCardlessCreditCode(CardlessCreditCode $cardlessCredit): string
     {
-        $code = $this->qrPaymentCodeMap[$qrPayment->value] ?? null;
+        $code = $this->cardlessCreditCodeMap[$cardlessCredit->value] ?? null;
 
         if ($code === null) {
             throw new UnsupportedPaymentMethodException(
-                "QR Payment [{$qrPayment->value}] is not supported by " . static::class
+                "Cardless Credit [{$cardlessCredit->value}] is not supported by " . static::class
             );
         }
 

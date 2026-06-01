@@ -28,6 +28,8 @@ class PaymentHub implements PaymentInterface
             return $this->payWithQRPayment($request);
         } elseif($request->getCardTokenId()) {
             return $this->payWithCard($request);
+        } elseif($request->getCardlessCredit()) {
+            return $this->payWithCardlessCredit($request);
         } else {
             throw new UnsupportedPaymentMethodException("No payment method specified in request");
         }
@@ -56,6 +58,11 @@ class PaymentHub implements PaymentInterface
     public function payWithOutlet(PaymentRequest $request): PaymentResponse
     {
         return $this->gateway->payWithOutlet($request);
+    }
+
+    public function payWithCardlessCredit(PaymentRequest $request): PaymentResponse
+    {
+        return $this->gateway->payWithCardlessCredit($request);
     }
 
     public function get(string $orderId): PaymentResponse

@@ -3,17 +3,20 @@
 namespace Cloudbadak\PaymentHub\Data;
 
 use Cloudbadak\PaymentHub\Data\Customer;
+use Cloudbadak\PaymentHub\Data\Seller;
 use Cloudbadak\PaymentHub\Data\Item;
 use Cloudbadak\PaymentHub\Enums\BankCode;
 use Cloudbadak\PaymentHub\Enums\EWalletCode;
 use Cloudbadak\PaymentHub\Enums\OutletCode;
 use Cloudbadak\PaymentHub\Enums\QRPaymentCode;
+use Cloudbadak\PaymentHub\Enums\CardlessCreditCode;
 
 class PaymentRequest
 {
     public string $orderId;
     public int $amount;
     public ?Customer $customer = null;
+    public ?Seller $seller = null;
     public ?array $items = [];
 
     /** Digunakan oleh payWithVirtualAccount() */
@@ -30,6 +33,9 @@ class PaymentRequest
 
     /** Digunakan oleh payWithCard() */
     public ?string $cardTokenId = null;
+
+    /** Digunakan oleh payWithCardlessCredit() */
+    public ?CardlessCreditCode $cardlessCredit = null;
 
     public function __construct(string $orderId, int $amount, ?Customer $customer = null, ?array $items = []){
         $this->orderId = $orderId;
@@ -78,9 +84,19 @@ class PaymentRequest
         return $this->qrPayment;
     }
 
+    public function getCardlessCredit(): ?CardlessCreditCode
+    {
+        return $this->cardlessCredit;
+    }
+
     public function getCardTokenId(): ?string
     {
         return $this->cardTokenId;
+    }
+
+    public function getSeller(): ?Seller
+    {
+        return $this->seller;
     }
 
     public function setBank(?BankCode $bank): void
@@ -103,14 +119,19 @@ class PaymentRequest
         $this->qrPayment = $qrPayment;
     }
 
-    public function setCustomer(?Customer $customer): void
-    {
-        $this->customer = $customer;
-    }
-
     public function setCardTokenId(?string $cardTokenId): void
     {
         $this->cardTokenId = $cardTokenId;
+    }
+
+    public function setCardlessCredit(?CardlessCreditCode $cardlessCredit): void
+    {
+        $this->cardlessCredit = $cardlessCredit;
+    }
+
+    public function setCustomer(?Customer $customer): void
+    {
+        $this->customer = $customer;
     }
 
     public function setItems(?array $items): void
@@ -121,5 +142,10 @@ class PaymentRequest
     public function addItem(Item $item): void
     {
         $this->items[] = $item;
+    }
+
+    public function setSeller(?Seller $seller): void
+    {
+        $this->seller = $seller;
     }
 }

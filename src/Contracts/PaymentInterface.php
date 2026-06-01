@@ -12,6 +12,7 @@ interface PaymentInterface
     public function payWithCard(PaymentRequest $request): PaymentResponse;
     public function payWithQRPayment(PaymentRequest $request): PaymentResponse;
     public function payWithOutlet(PaymentRequest $request): PaymentResponse;
+    public function payWithCardlessCredit(PaymentRequest $request): PaymentResponse;
 
     public function get(string $orderId): PaymentResponse;
     public function balance(): string;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Cloudbadak\PaymentHub\Data;
+namespace Cloudbadak\PaymentHub\Enums;
 
 enum PaymentStatus
 {
@@ -8,5 +8,5 @@ enum PaymentStatus
     case PAID; // sudah dibayar (lunas)
     case EXPIRED; // sudah kadaluarsa
     case FAILED; // gagal
-    case REFUNDED; // sudah dikembalikan
+    case REFUND; // sudah dikembalikan
 }
