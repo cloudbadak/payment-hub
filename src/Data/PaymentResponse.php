@@ -54,7 +54,7 @@ class PaymentResponse
         return $this;
     }
 
-    public function setBankTransfer(string $virtualAccountNumber, string $billerCode, string $billerName): self
+    public function setBankTransfer(string $virtualAccountNumber, ?string $billerCode, ?string $billerName): self
     {
         $this->virtualAccountNumber = $virtualAccountNumber;
         $this->billerCode = $billerCode;

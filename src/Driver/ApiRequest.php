@@ -11,7 +11,9 @@ class ApiRequest
     protected int $timeOut;
 
     private int $responseCode = 400;
-    private array $headers = [];
+    private array $headers = [
+        'Content-Type' => 'application/json',
+    ];
 
     public function __construct(string $baseUrl, int $timeOut = 5, array $headers = [])
     {
@@ -23,6 +25,20 @@ class ApiRequest
     public function getResponseCode(): int
     {
         return $this->responseCode;
+    }
+
+    public function isOk(): bool
+    {
+        return $this->responseCode >= 200 && $this->responseCode <= 299;
+    }
+
+    /**
+     * Convert associative array headers to CURL format
+     * ['Content-Type' => 'application/json'] => ['Content-Type: application/json']
+     */
+    private function formatHeadersForCurl(array $headers): array
+    {
+        return array_map(fn($key, $value) => "{$key}: {$value}", array_keys($headers), array_values($headers));
     }
 
     public function post(string $endpoint, array $data = [], array $headers = [])
@@ -38,9 +54,7 @@ class ApiRequest
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode($data),
-            CURLOPT_HTTPHEADER => array_merge(array(
-                'Content-Type: application/json',
-            ), $headers),
+            CURLOPT_HTTPHEADER => $this->formatHeadersForCurl($headers),
         ));
 
         $response = curl_exec($curl);
@@ -71,9 +85,7 @@ class ApiRequest
             CURLOPT_CONNECTTIMEOUT => 3,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_CUSTOMREQUEST => 'GET',
-            CURLOPT_HTTPHEADER => array_merge(array(
-                'Content-Type: application/json',
-            ), $headers),
+            CURLOPT_HTTPHEADER => $this->formatHeadersForCurl($headers),
         ));
 
         $response = curl_exec($curl);

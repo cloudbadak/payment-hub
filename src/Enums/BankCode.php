@@ -22,4 +22,6 @@ enum BankCode: string
     case SAHABAT    = 'SAHABAT';
     case SEABANK    = 'SEABANK';
     case SAQU       = 'SAQU';
+    case SMBC       = 'SMBC';
+    case BNC        = 'BNC';
 }

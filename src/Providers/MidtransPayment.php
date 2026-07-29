@@ -77,12 +77,17 @@ class MidtransPayment extends AbstractPaymentGateway
      * BALANCE & GET PAYMENT
      */
 
-    public function balance(): string
+    public function token(): ?string
+    {
+        return null;
+    }
+
+    public function balance(): ?string
     {
         throw new UnsupportedPaymentMethodException("Midtrans does not support get balance");
     }
 
-    public function get(string $orderId): PaymentResponse
+    public function get(string $orderId): ?PaymentResponse
     {
         $request = $this->apiRequest->get($orderId . '/status');
         return $this->makeResponse($request, $this->apiRequest->getResponseCode());
@@ -92,7 +97,7 @@ class MidtransPayment extends AbstractPaymentGateway
      * ACCEPT PAYMENTS
      */
 
-    public function payWithVirtualAccount(PaymentRequest $request): PaymentResponse
+    public function payWithVirtualAccount(PaymentRequest $request): ?PaymentResponse
     {
         $bankCode = $this->resolveBankCode($request->getBank());
         $payload = [
@@ -124,7 +129,7 @@ class MidtransPayment extends AbstractPaymentGateway
         return $this->makeResponse($response, $this->apiRequest->getResponseCode());
     }
 
-    public function payWithEWallet(PaymentRequest $request): PaymentResponse
+    public function payWithEWallet(PaymentRequest $request): ?PaymentResponse
     {
         $walletCode = $this->resolveWalletCode($request->getEWallet());
         $payload = [
@@ -145,7 +150,7 @@ class MidtransPayment extends AbstractPaymentGateway
         return $this->makeResponse($response, $this->apiRequest->getResponseCode());
     }
 
-    public function payWithCard(PaymentRequest $request): PaymentResponse
+    public function payWithCard(PaymentRequest $request): ?PaymentResponse
     {
         $payload = [
             "payment_type" => 'credit_card',
@@ -163,7 +168,7 @@ class MidtransPayment extends AbstractPaymentGateway
         return $this->makeResponse($response, $this->apiRequest->getResponseCode());
     }
 
-    public function payWithQRPayment(PaymentRequest $request): PaymentResponse
+    public function payWithQRPayment(PaymentRequest $request): ?PaymentResponse
     {
         $qrCode = $this->resolveQRPaymentCode($request->getQrPayment());
         $payload = [
@@ -179,7 +184,7 @@ class MidtransPayment extends AbstractPaymentGateway
         return $this->makeResponse($response, $this->apiRequest->getResponseCode());
     }
 
-    public function payWithOutlet(PaymentRequest $request): PaymentResponse
+    public function payWithOutlet(PaymentRequest $request): ?PaymentResponse
     {
         $outletCode = $this->resolveOutletCode($request->getOutlet());
         $payload = [
@@ -198,7 +203,7 @@ class MidtransPayment extends AbstractPaymentGateway
         return $this->makeResponse($response, $this->apiRequest->getResponseCode());
     }
 
-    public function payWithCardlessCredit(PaymentRequest $request): PaymentResponse
+    public function payWithCardlessCredit(PaymentRequest $request): ?PaymentResponse
     {
         $creditCode = $this->resolveCardlessCreditCode($request->getCardlessCredit());
         $payload = [
@@ -219,7 +224,7 @@ class MidtransPayment extends AbstractPaymentGateway
      * WEBHOOK
      */
 
-    public function webhook(?string $payload = null): PaymentResponse
+    public function webhook(?string $payload = null): ?PaymentResponse
     {
         $rawBody = file_get_contents('php://input');
         if (empty($rawBody)) {

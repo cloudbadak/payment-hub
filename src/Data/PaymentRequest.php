@@ -18,6 +18,9 @@ class PaymentRequest
     public ?Customer $customer = null;
     public ?Seller $seller = null;
     public ?array $items = [];
+    public ?string $successReturnUrl = null;
+    public ?string $failureReturnUrl = null;
+    public ?string $expirationReturnUrl = null;
 
     /** Digunakan oleh payWithVirtualAccount() */
     public ?BankCode $bank = null;
@@ -99,6 +102,21 @@ class PaymentRequest
         return $this->seller;
     }
 
+    public function getSuccessReturnUrl(): ?string
+    {
+        return $this->successReturnUrl;
+    }
+
+    public function getFailureReturnUrl(): ?string
+    {
+        return $this->failureReturnUrl;
+    }
+
+    public function getExpirationReturnUrl(): ?string
+    {
+        return $this->expirationReturnUrl;
+    }
+
     public function setBank(?BankCode $bank): void
     {
         $this->bank = $bank;
@@ -147,5 +165,12 @@ class PaymentRequest
     public function setSeller(?Seller $seller): void
     {
         $this->seller = $seller;
+    }
+
+    public function setReturnUrl(string $success, ?string $failure = null, ?string $expired = null): void
+    {
+        $this->successReturnUrl = $success;
+        $this->failureReturnUrl = $failure ?? $success;
+        $this->expirationReturnUrl = $expired ?? $this->failureReturnUrl;
     }
 }

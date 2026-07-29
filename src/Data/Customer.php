@@ -59,4 +59,46 @@ class Customer {
     {
         return $this->phone;
     }
+
+    public function getPhoneCode(): ?string
+    {
+        if(!$this->phone) return null;
+        $number = preg_replace('/\D/', '',$this->phone);
+        $code1 = (int) substr($number, 0, 1);
+        $code2 = (int) substr($number, 0, 2);
+        $code3 = (int) substr($number, 0, 3);
+        
+        if(in_array($code1,[1,7])){
+            return "+" . $code1;
+        }
+
+        if(in_array($code2, [20,30,31,32,33,34,36,39,40,41,43,44,45,46,47,48,49])){
+            return "+" . $code2;
+        }
+
+        if(in_array($code2, [51,52,53,54,55,56,57,58])){
+            return "+" . $code2;
+        }
+
+        if(in_array($code2, [60,61,62,63,64,65,66])){
+            return "+" . $code2;
+        }
+
+        if(in_array($code2, [81,82,84,86])){
+            return "+" . $code2;
+        }
+
+        if(in_array($code2, [90,91,92,93,94,95,98])){
+            return "+" . $code2;
+        }
+
+        return "+" . $code3;
+    }
+
+    public function getPhoneNumber(): ?string
+    {
+        if(!$this->phone) return null;
+        $code = $this->getPhoneCode();
+        return str_replace($code, '', $this->phone);
+    }
 }

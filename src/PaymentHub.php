@@ -75,6 +75,11 @@ class PaymentHub implements PaymentInterface
         return $this->gateway->balance();
     }
 
+    public function token(): ?string
+    {
+        return $this->gateway->token();
+    }
+
     public function webhook(?string $payload = null): PaymentResponse
     {
         return $this->gateway->webhook($payload);
